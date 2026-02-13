@@ -44,9 +44,9 @@ Currently working on (details in TOPICS..)
 
 - JP rjd3providers over the summer 
 
-- Tanguy over CRAN requirements (holes)
+- Tanguy over CRAN batch 2:
 
-- Anna Holes and vignettes (5main)
+- Anna Holes and vignettes (5 main)
     - rjd3workspace 
     - ...
     
@@ -110,10 +110,7 @@ gros tableau
 
 ### Dvlpt 
 
-dans print "model" in rjd3x13 and tramoseats 
 
-- add series span and model span: underway
-(present only in print(spec))
 
 #### Tests
 
@@ -122,7 +119,6 @@ dans print "model" in rjd3x13 and tramoseats
 - seasonal filters and seasonal sigma (anna: bilan)
 
 #### New features (test and doc)
-
 
 MAIN GUI + R
 (Anna)

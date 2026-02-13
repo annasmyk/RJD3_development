@@ -18,7 +18,7 @@ library(tsbox)
 # S1 : deterministic and...
 # weekly
 alpha <- 1 # paper value
-sw <- 100 # function needed input (param /100)
+sw <- 1000 # function needed input (param /100)
 
 #yearly
 beta <- 1 # paper value

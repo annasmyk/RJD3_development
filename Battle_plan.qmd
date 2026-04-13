@@ -36,6 +36,129 @@ GUI
 
 Currently working on (details in TOPICS..)
 
+### Maj doc refresh 
+
+clarified txt and examples in 
+- x13 regarima refresh 
+- tramos eats 
+
+Harmonize refresh policies names
+
+#### refesh rjd3workspace 
+
+special title in github page : ok 
+rename domain spec to ref spec 
+
+get set 
+read sai: args + example : ok 
+
+
+
+
+
+
+function toolkit .jdomain ?
+
+get_active_specification(jsai) ?
+
+fatih code 
+
+#### Spotted x13 issues
+
+- free parameters doesn't reestimate arima coeffs : true ?
+- free parameters inst the default
+
+# comportement avec la partie reg arim
+## - n'efface pas set transform avec complete !! ISSUE ? voir GUI
+
+# comportement avec partie x11
+    ## DOC correction de x11 spec
+    ## DOC correction de set_x11
+
+## avec complete effacement de tous les params
+
+# comportement avec partie benchmarking
+
+    ## Doc correction set_benchmarking
+
+#### Tests with ramps user def regressors 
+
+#### T: Harmonize refresh names (with GUI)
+
+#### Induced maj quarto book
+
+#### Spotted tramoseats issues
+
+- idem as x13 for refresh ?
+
+- lack print elements in seats ? bcasts, forecasts ?
+
+
+
+### rjd3prodcution 
+
+What is indispensable for DT publi ?
+
+- readme 
+
+- functions names referenced 
+
+= > ok, see the rest post publi 
+
+
+To "solve":
+
+- pb limitation insee regressors 
+
+- why using "working day regressors" ?
+
+- reformulation sur to each series (s-item) rather than seasonal adjustment model 
+
+- assign 
+    - pb examples ?
+
+- compare 
+    - Extract all series from a SA-Item : pb as not in the sa item .....
+    
+    
+
+- data with holes ?
+
+- modify_specification 
+
+update here: Typical use case: after "estimation with user pre-specified outliers" (not automatic), outliers with
+weak statistical significance (e.g. `p > 0.3`) are dropped to
+simplify the regression specification.
+
+là encore pb emploi "seasonal adjustment models" with "SAI"
+
+- Set span minimum to a value: to see...
+
+- title:  Variables named in workspace ? reviewed 
+
+- pb of using experssion "regression outliers"
+
+-  - `retrieve_outliers()` returns a named list where each element
+   corresponds to a series in the workspace and contains the names
+   of existing (detected or pre-specified) outliers.
+ 
+- why this description
+These functions allow extracting, exporting, and importing the
+*calendrier jours ouvrés* (TD) regressors used in JDemetra+ workspaces
+
+- select file 
+
+why this title : "Diagnostics and Regression Selection for X13 Models" 
+
+- pb use airpassengers, take an exmaple in a toolkit data base
+
+
+Calendar regressors selection for X13 Models: new title 
+
+LOOK : at isues ...
+
+
+
 ### CRAN
 
 T: rjd3workspace, rjd3production

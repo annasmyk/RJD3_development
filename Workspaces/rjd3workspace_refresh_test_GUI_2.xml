@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:demetraGenericWorkspace xmlns="ec/tss.core" xmlns:ns2="ec/tss.demetra" name="rjd3workspace_refresh_test_GUI">
+<ns2:demetraGenericWorkspace xmlns="ec/tss.core" xmlns:ns2="ec/tss.demetra" name="rjd3workspace_refresh_test_GUI_2">
     <ns2:items>
         <ns2:item readOnly="false">
             <ns2:family>Utilities@Variables</ns2:family>

@@ -1,0 +1,245 @@
+---
+title: "rjd3toolkit_Distributions"
+format: html
+---
+
+
+Distributions
+
+PDFs, CDFs and inverses
+
+density_chi2() cdf_chi2() random_chi2()
+Chi-Squared Distribution
+density_gamma() cdf_gamma() random_gamma()
+Gamma Distribution
+density_inverse_gamma() cdf_inverse_gamma() random_inverse_gamma()
+Inverse-Gamma Distribution
+density_inverse_gaussian() cdf_inverse_gaussian() random_inverse_gaussian()
+Inverse-Gaussian Distribution
+density_t() cdf_t() random_t()
+Student Distribution 
+
+
+## Student
+
+native R from \url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/TDist}
+
+```{r}
+
+# Probability density function of T with 2 degrees of freedom
+
+# Toolkit 
+z <- density_t(df = 2, .01 * seq(-100, 100, 1))
+plot(z)
+
+# Native R
+zr<- dt(x=.01 * seq(-100, 100, 1), df=2, log = FALSE)
+plot(zr)
+
+# Generating a random vector with each component drawn from a T(2) distribution
+z <- random_t(120, 100)
+plot(z)
+
+# Native R
+zr<-rt(n=100, df=12)
+plot(zr)
+ 
+# Computing the probability that the random variable X following a T distribution
+# with df degrees of freedom is lower than x
+z <- cdf_t(df = 12, x = 1.2)
+z
+
+# native R
+
+#pt(q, df, ncp, lower.tail = TRUE, log.p = FALSE)
+# pt= cdf
+zr<-pt(1.2,12)
+zr # ok 
+
+z <- cdf_t(df = 12, x = c(0:10)) # array of values
+z
+
+# pas de inverse cdf for student dans toolkit 
+# qt = inverse cdf qt(p, df, ncp, lower.tail = TRUE, log.p = FALSE)
+q<- qt(0.95,30)
+
+q
+```
+
+```{r}
+
+
+# NOT RUN {
+require(graphics)
+
+1 - pt(1:5, df = 1)
+qt(.975, df = c(1:10,20,50,100,1000))
+
+tt <- seq(0, 10, len = 21)
+ncp <- seq(0, 6, len = 31)
+ptn <- outer(tt, ncp, function(t, d) pt(t, df = 3, ncp = d))
+t.tit <- "Non-central t - Probabilities"
+image(tt, ncp, ptn, zlim = c(0,1), main = t.tit)
+persp(tt, ncp, ptn, zlim = 0:1, r = 2, phi = 20, theta = 200, main = t.tit,
+      xlab = "t", ylab = "non-centrality parameter",
+      zlab = "Pr(T <= t)")
+
+plot(function(x) dt(x, df = 3, ncp = 2), -3, 11, ylim = c(0, 0.32),
+     main = "Non-central t - Density", yaxs = "i")
+# }
+```
+
+
+## CHi2
+
+add native R 
+
+native R from \url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/Chisquare}
+
+```{r}
+
+# Probability density function for a Chi-Square distribution with 3 degrees of freedom.
+z <-density_chi2(df = 3,.01 * seq(-100, 100, 1))
+plot(z)
+# native R
+zr<-dchisq(.01 * seq(-100, 100, 1), df=3, ncp = 0, log = FALSE)
+plot(zr)
+# ok
+
+
+# Computing the probability that the random variable X following a Chi-Square distribution
+# with df degrees of freedom is lower than x
+z<-cdf_chi2(df = 3, 1:10)
+z
+
+# native r
+zr<- pchisq(1:10, df=3, ncp = 0, lower.tail = TRUE, log.p = FALSE)
+zr
+
+# inverse cdf pour quantiles, not in toolkit
+qchisq(p, df, ncp = 0, lower.tail = TRUE, log.p = FALSE)
+
+
+# Generating a random vector with each component drawn from a Chi-square distribution
+# with df degrees of freedom 
+z <- random_chi2(df = 3, n = 10)
+z
+
+# native R
+rchisq(n=10, df=3, ncp = 0)
+
+```
+
+## Gamma dsitribution: PB results 
+
+add native R 
+
+native R from \url{https://www.rdocumentation.org/packages/Rlab/versions/4.5.1/topics/Gamma}
+
+```{r}
+#' density_gamma(shape = 1, scale = 2, x = 1:10)
+#' cdf_gamma(shape = 1, scale = 2, x = 1:10)
+#' 
+
+
+# Probability density function for a Gamma distribution
+z <-density_gamma(shape = 7.5, scale =0.5 , x=.001 * seq(0, 300, 1))
+plot(z)
+
+
+# native R
+zr<-dgamma(dgamma(x, alpha = 7.5, beta = 0.5)
+plot(zr)
+
+# TO CHECK
+
+
+# Computing the probability that the random variable X following a Gamma distribution
+# with shape 1 and scale 2 is lower than x
+z<-cdf_gamma(shape = 1, scale = 2, x = 1:10)
+z
+
+# native r
+zr<- pchisq(1:10, df=3, ncp = 0, lower.tail = TRUE, log.p = FALSE)
+zr
+
+## gamma 
+# inverse cdf pour quantiles, not in toolkit
+qchisq(p, df, ncp = 0, lower.tail = TRUE, log.p = FALSE)
+
+
+# Generating a random vector with each component drawn from a Gamma distribution
+# with shape 1 and scale 2
+z<- random_gamma(shape = 1, scale = 2, n = 10)
+z
+
+# native R
+rchisq(n=10, df=3, ncp = 0)
+
+
+```
+## Inverse gamma 
+
+add native R 
+
+native R from \url{https://www.rdocumentation.org/packages/nimble/versions/1.4.1/topics/Inverse-Gamma}
+
+```{r}
+
+#' density_inverse_gamma(shape = 1, scale = 2, x = 1:10)
+#' cdf_inverse_gamma(shape = 1, scale = 2, x = 1:10)
+#' random_inverse_gamma(shape = 1, scale = 2, n = 10)
+#' 
+#' # Probability density function for an Inverse Gamma distribution
+z <-density_inverse_gamma(shape = 1, scale = 2,x=.001 * seq(0, 300, 1))
+plot(z)
+
+# Computing the probability that the random variable X following an Inverse Gamma distribution
+# with shape 1 and scale 2 is lower than x
+z<-cdf_inverse_gamma(shape = 1, scale = 2, x = 1:10)
+z
+
+# Generating a random vector with each component drawn from an Inverse Gamma distribution
+# with shape 1 and scale 2
+z<- random_inverse_gamma(shape = 1, scale = 2, n = 10)
+z
+
+```
+## Inverse gaussian: check results 
+
+
+
+```{r}
+dinvgauss(y, m, s, log=FALSE)
+pinvgauss(q, m, s)
+qinvgauss(p, m, s)
+rinvgauss(n, m, s)
+
+
+dinvgauss(y=5, 5, 1)
+pinvgauss(5, 5, 1)
+qinvgauss(0.8, 5, 1)
+rinvgauss(10, 5, 1)
+
+#' density_inverse_gaussian(shape = 1, scale = 2, x = 1:10)
+#' random_inverse_gaussian(shape = 1, scale = 2, n = 5)
+#' 
+#' # Probability density function for an Inverse Gaussian distribution
+z <-density_inverse_gaussian(shape = 1, scale = 2, x = 0.1* 0:30)
+plot(z)
+
+# # Computing the probability that the random variable X following an Inverse Gaussian distribution
+# # with shape 1 and scale 2 is lower than x
+# z<-cdf_inverse_gamma(shape = 1, scale = 2, x = 1:10)
+# z
+
+# Generating a random vector with each component drawn from an Inverse Gaussian distribution
+# with shape 1 and scale 2
+z<-random_inverse_gaussian(shape = 1, scale = 2, n = 5)
+z
+
+
+
+```
+
+

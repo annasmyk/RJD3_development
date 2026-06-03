@@ -1,0 +1,383 @@
+---
+title: "T-rjd3tramoseats_refresh_tests"
+format: html
+---
+
+# PB T solved in x12: same for TS ?
+
+# Objectifs
+
+- key reproducible format of testing (pre-vignette)
+- the vignette
+
+- end up with updated Fatih code and verif results in rjd3ws (not here)
+
+## general 
+
+- harmonize policies names 
+
+## o1: one refresh qmd per concerned package 
+
+- with issues
+
+
+```{r}
+#| label: loading-rjdverse
+#| echo: true
+#| eval: true
+library("rjd3toolkit")
+library("rjd3tramoseats")
+
+```
+
+
+```{r}
+#| label: data import 
+#| echo: true
+#| eval: true
+# Data  :
+ipi <- read.csv2(
+    "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Data/IPI_nace4.csv"
+)
+ipi$date <- as.Date(ipi$date, format = "%d/%m/%Y")
+ipi[, -1] <- sapply(ipi[, -1], as.numeric)
+# creating a TS object from a data frame
+y_raw <- ts(
+    ipi[, "RF0812"],
+    frequency = 12,
+    start = c(1990, 1),
+    end = c(2021, 12)
+)
+y_new <- ts(
+    ipi[, "RF0812"],
+    frequency = 12,
+    start = c(1990, 1),
+    end = c(2022, 9)
+)
+
+# start(y_raw)
+end(y_raw)
+# start(y_new)
+end(y_new)
+
+## add points for outlier detection 
+window(y_new,start=c(2022,3), end=c(2022,5))<-c(51,52,53)
+
+
+```
+
+
+
+
+
+
+## first estimation and spec to be refreshed
+
+```{r}
+# specification for first estimation
+spec_ts_1 <- tramoseats_spec("rsa5")
+spec_ts_1 <-add_outlier(spec_ts_1, type = "AO",
+                         date = c("2020-03-01","2020-04-01"))
+
+# first estimation
+sa_ts <- tramoseats(y_raw, spec_ts_1) # AO (2000,6) and TD (2000,7)
+sa_ts
+
+# def of specs to refresh
+
+current_result_spec <- sa_ts$result_spec
+reference_spec <- sa_ts$estimation_spec
+
+```
+# Tramo-seats PRINT pbs
+
+- outliers
+
+- seats PARAMS
+
+ISSUE set up 
+
+```{r}
+#| echo: true
+#| eval: true
+library("rjd3toolkit")
+library("rjd3tramoseats")
+spec<-tramoseats_spec("rsafull")
+spec <-set_seats(spec,
+  fcasts = -3,
+  bcasts = -3,
+  bias = TRUE)
+spec
+```
+
+
+same pbs in model print ? NO doesn't really make sense
+
+```{r}
+#| echo: true
+#| eval: true
+library("rjd3toolkit")
+library("rjd3tramoseats")
+spec<-tramoseats_spec("rsafull")
+spec <-set_seats(spec,
+  fcasts = -3,
+  bcasts = -3,
+  bias = TRUE)
+spec
+sa_ts<-tramoseats(rjd3toolkit::ABS$X0.2.09.10.M,spec)
+sa_ts
+summary(sa_ts)
+```
+
+
+
+### Fixed: FIXED
+
+```{r}
+#| echo: true
+#| eval: false
+library("rjd3toolkit")
+library("rjd3tramoseats")
+# specification for first estimation
+spec_ts_1 <- tramoseats_spec("rsa5")
+
+y_raw<-rjd3toolkit::ABS$X0.2.05.10.M
+# first estimation
+sa_ts <- tramoseats(y_raw, spec_ts_1) 
+sa_ts
+
+# specs to refresh
+current_result_spec <- sa_ts$result_spec
+reference_spec <- sa_ts$estimation_spec
+spec_ts_ref <- tramoseats_refresh(
+    current_result_spec,
+    reference_spec, 
+    policy = "Fixed")
+spec_ts_ref
+sa_ts_ref <- tramoseats(y_new, spec_ts_ref)
+summary(sa_ts_ref)
+```
+
+### Fixed: Fixed parameters and CO (pb initial)
+
+```{r}
+#| echo: true
+#| eval: false
+library("rjd3toolkit")
+library("rjd3tramoseats")
+library("rjd3x13")
+# specification for first estimation
+spec_ts_1 <- tramoseats_spec("rsa5")
+spec_x13_1 <- x13_spec("rsa5")
+y_raw<-rjd3toolkit::ABS$X0.2.05.10.M
+# first estimation
+sa_ts <- tramoseats(y_raw, spec_ts_1) 
+sa_x13<-x13(y_raw,spec_x13_1)
+
+# refresh with tramoseats 
+current_result_spec <- sa_ts$result_spec
+reference_spec <- sa_ts$estimation_spec
+spec_ts_ref <- tramoseats_refresh(
+    current_result_spec,
+    reference_spec, 
+    policy = "FixedParameters")
+spec_ts_ref
+
+refresh with x13
+current_result_spec <- sa_x13$result_spec
+reference_spec <- sa_x13$estimation_spec
+spec_x13_ref <- x13_refresh(
+    current_result_spec,
+    reference_spec, 
+    policy = "FixedParameters")
+spec_x13_ref
+
+
+sa_ts_ref <- tramoseats(y_new, spec_ts_ref)
+summary(sa_ts_ref)
+```
+
+# Test of period, start end parameters 
+
+### Current
+
+```{r}
+#| echo: true
+#| eval: false
+library("rjd3toolkit")
+library("rjd3tramoseats")
+
+# specification for first estimation
+spec_ts_1 <- tramoseats_spec("rsa5")
+
+y_raw<-rjd3toolkit::ABS$X0.2.05.10.M
+# first estimation
+sa_ts <- tramoseats(y_raw, spec_ts_1) 
+sa_ts
+
+# specs to refresh
+current_result_spec <- sa_ts$result_spec
+reference_spec <- sa_ts$estimation_spec
+spec_ts_ref <- tramoseats_refresh(
+    current_result_spec,
+    reference_spec, 
+    period=12,
+    start=c(2017,1),
+    end = c(2017,6),
+    policy = "Current")
+spec_ts_ref
+sa_ts_ref <- tramoseats(y_new, spec_ts_ref)
+summary(sa_ts_ref)
+```
+
+#### Concl and Issues draft 
+
+Issue set up 
+
+- if `period` is missing and nothing else is specified, error message but not explicit enough
+Error in if (end[2] == period) end <- c(end[1] + 1, 1) else end <- c(end[1],  : 
+ argument length is zero 
+  
+Suggestion change to ERROR: With "policy = current", arguments `period`, `start` and `end` have to be specified"
+
+- if `period` is missing but `start` and `end` are specified: no error, no warning, but NOTHING happens
+
+Suggestion generate error and change message to ERROR: With "policy = current", arguments `period`, `start` and `end` have to be specified"
+
+- if only `period` and `start` are specified: error but message could be improved 
+Suggestion change to ERROR: With "policy = current", arguments `period`, `start` and `end` have to be specified"
+
+
+- if only `period` and `end are specified: specification written but estimation will generate an error 
+
+Suggestion generate error and change message to ERROR: With "policy = current", arguments `period`, `start` and `end` have to be specified"
+
+
+- if `period` `start` and `end` but`start` is before `end`, ignores the `start`: no error nor warning and no refresh 
+
+Suggestion generate error and change message to ERROR: With "policy = current", arguments `period`, `start` and `end` have to be specified"
+
+- if `period` `end` and `start`, correctly specified
+    - AO's are not printed in refreshed spec in the refreshed spec 
+    
+see code below to generate all those cases 
+
+
+    
+    
+    
+Q: JP estimation and fixed model ? (tout fixé,..coeffs contraints)
+
+##### Issues
+
+
+#### TPs (with T) à programmer
+
+- print 
+- warning 
+- error massage 
+# current meant to be: AO on NEW data points, or in fact from date ?
+
+
+### Outliers
+
+```{r}
+#| echo: true
+#| eval: false
+spec_ts_ref <- tramoseats_refresh(
+    current_result_spec, # point spec to be refreshed
+    reference_spec, # domain spec (set of constraints)
+    period=12,
+    start=c(2000,1),
+    # end = c(2019,12), # ignored as in x13: ok 
+    policy = "Outliers")
+spec_ts_ref
+sa_ts_ref <- tramoseats(y_new, spec_ts_ref)
+sa_ts_ref
+
+
+summary(sa_ts_ref)
+end(y_raw)
+```
+
+#### Concl and Issues draft 
+
+ok
+
+- dans TS pb de print: outliers is enabled: NO (tjs)
+
+- si period absent et rien: pas d'erreur mais ne garde pas les outliers de ref spec ??, mais garde bien les ordres arima 
+
+- si period absent mais stat and end renseignés: star et end ingnorés et pre-specified de ref spec ignores 
+
+
+- si period seul: pas de reidentification !!! DOC + manque message 
+
+- si period et start seul: reidentification à partir du start ok 
+
+
+- si period and end seul: pas de reidentification 
+
+
+- si period start end : 
+
+-- start apres: ignore le end  ne fait rien, mais pas d'avertissement 
+
+print: detection FROM même si end, from to
+(voir les prints des spans)
+
+- si period end and start, corrects:
+    - pas de end dans le print
+    - ignore le end !!!! I 
+
+- print dans tramo manque les fixe/ initial comme dans x13
+
+##### Issues
+
+
+
+### Outliers stochastic component 
+
+```{r}
+#| echo: true
+#| eval: false
+spec_ts_ref <- tramoseats_refresh(
+    current_result_spec, # point spec to be refreshed
+    reference_spec, # domain spec (set of constraints)
+    period=12,
+    start=c(2020,1),
+    # end = c(2022,4),
+    policy = "Outliers_StochasticComponent")
+spec_ts_ref
+window(y_new, start=c(1999,2),end=c(1999,2))<-12
+sa_ts_ref <- tramoseats(y_new, spec_ts_ref)
+sa_ts_ref
+
+
+summary(sa_ts_ref)
+end(y_raw)
+```
+
+#### Concl and Issues draft 
+
+- si period start end ok : 
+
+-- arima reestimation ok 
+
+
+print: detection FROM même si end, from to
+(voir les prints des spans)
+
+- si period end and start, corrects:
+    - pas de end dans le print
+    - ignore le end !!!! I et Doc (only from the time being)
+    
+dans TS avec outliers stoch comp  ISSUE 
+il n'affiche les pre-speciified dans la spec avant le start
+et il redecte (si on ajoute oulier avant comp il le voit)
+    
+TS and X13 classer les ouliers par date dans 
+- print spec 
+
+##### Issues
+

@@ -1,0 +1,283 @@
+---
+title: "T-rj3x13_ts_refresh_tests"
+format: html
+---
+
+# Objectifs
+
+- key reproducible format of testing (pre-vignette)
+- the vignette
+
+- end up with updated Fatih code and verif results in rjd3ws (not here)
+
+## general 
+
+- harmonize policies names 
+
+## recap JP questions 
+
+## o1: one refresh qmd per concerned package 
+
+- with issues
+
+
+
+```{r}
+#| label: loading-rjdverse
+#| echo: true
+#| eval: true
+library("rjd3toolkit")
+library("rjd3x13")
+
+```
+
+
+```{r}
+#| label: data import 
+#| echo: true
+#| eval: true
+# Data  :
+ipi <- read.csv2(
+    "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Data/IPI_nace4.csv"
+)
+ipi$date <- as.Date(ipi$date, format = "%d/%m/%Y")
+ipi[, -1] <- sapply(ipi[, -1], as.numeric)
+# creating a TS object from a data frame
+y_raw <- ts(
+    ipi[, "RF0812"],
+    frequency = 12,
+    start = c(1990, 1),
+    end = c(2021, 12)
+)
+y_new <- ts(
+    ipi[, "RF0812"],
+    frequency = 12,
+    start = c(1990, 1),
+    end = c(2022, 9)
+)
+
+# start(y_raw)
+end(y_raw)
+# start(y_new)
+end(y_new)
+
+## add points for outlier detection 
+window(y_new,start=c(2022,3), end=c(2022,5))<-c(51,52,53)
+
+
+```
+
+
+# Policies with span clean up 
+
+## first estimation and spec to be refreshed
+
+```{r}
+# specification for first estimation
+spec_x13_1 <- x13_spec("rsa5c")
+spec_x13_1 <-add_outlier(spec_x13_1, type = "AO",
+                         date = c("2020-03-01","2020-04-01"))
+
+# first estimation
+sa_x13 <- x13(y_raw, spec_x13_1) # AO (2000,6) and TD (2000,7)
+sa_x13
+
+# def of specs to refresh
+
+current_result_spec <- sa_x13$result_spec
+reference_spec <- sa_x13$estimation_spec
+
+```
+
+
+## test of period, start end parameters 
+
+### Current
+
+```{r}
+#| echo: true
+#| eval: false
+spec_x13_ref <- x13_refresh(
+    current_result_spec, # point spec to be refreshed
+    reference_spec, # domain spec (set of constraints)
+    period=12,
+    start=c(2020,1),
+    end = c(2021,12),
+    policy = "Current")
+spec_x13_ref
+sa_x13_ref <- x13(y_new, spec_x13_ref)
+sa_x13_ref
+
+
+summary(sa_x13_ref)
+end(y_raw)
+```
+
+#### Concl and Issues draft : ok set up 
+
+- si period absent et rien, erreur 
+- si period absent mais star and end renseignés: pas d'erreur mais RIEN ne se passe
+- si period seul: erreur
+- si period et start seul: erreur
+- si period and seul: spec ok // mais estimation erreur (summary erreur: to detail)
+- si period start end : si start avant end, ignores le start: ne fait rien, mais pas d'avertissement 
+- si period end and start, corrects:
+    - AO pas marques dans la ref_spec !! PRINT
+    - estimation ok (AO posés ou on veut)
+Q: JP estimation and fixed model ? (tout fixé,..coeffs contraints)
+
+
+#### TPs (with T)
+
+- print 
+- warning 
+- error massage 
+
+
+
+### Outliers
+
+```{r}
+#| echo: true
+#| eval: false
+spec_x13_ref <- x13_refresh(
+    current_result_spec, # point spec to be refreshed
+    reference_spec, # domain spec (set of constraints)
+    period=12,
+    start=c(2000,1),
+    end = c(2019,12),
+    policy = "Outliers")
+spec_x13_ref
+sa_x13_ref <- x13(y_new, spec_x13_ref)
+sa_x13_ref
+
+
+summary(sa_x13_ref)
+end(y_raw)
+```
+
+#### Concl and Issues draft 
+
+- si period absent et rien: pas d'erreur mais ne garde pas les outliers de ref spec ??, mais garde bien les ordres arima 
+
+- si period absent mais star and end renseignés: star et end ingnorés et pre-specified de ref spec ignores 
+
+
+- si period seul: pas de reidentification !!! DOC + manque message 
+
+- si period et start seul: reidentification à partir du start ok 
+
+
+- si period and end seul: pas de reidentification 
+
+
+- si period start end : 
+
+-- start apres: ignore le end  ne fait rien, mais pas d'avertissement 
+
+print: detection FROM même si end, from to
+(voir les prints des spans)
+
+- si period end and start, corrects:
+    - pas de end dans le print
+    - ignore le end !!!! I 
+    
+Q: JP estimation and fixed model ? (tout fixé,..coeffs contraints)
+
+##### Issues
+
+
+
+### Outliers stochastic component 
+
+```{r}
+#| echo: true
+#| eval: false
+spec_x13_ref <- x13_refresh(
+    current_result_spec, # point spec to be refreshed
+    reference_spec, # domain spec (set of constraints)
+    period=12,
+    start=c(2020,1),
+    end = c(2022,4),
+    policy = "Outliers_StochasticComponent")
+spec_x13_ref
+sa_x13_ref <- x13(y_new, spec_x13_ref)
+sa_x13_ref
+
+
+summary(sa_x13_ref)
+end(y_raw)
+```
+
+#### Concl and Issues draft : ok 
+
+- si period start end ok : 
+
+-- arima reestimation ok 
+
+
+print: detection FROM même si end, from to
+(voir les prints des spans)
+
+- si period end and start, corrects:
+    - pas de end dans le print
+    - ignore le end !!!! I et Doc (only from the time being)
+    
+### Freeparameters 
+
+```{r}
+#| echo: true
+#| eval: false
+spec_x13_ref <- x13_refresh(
+    current_result_spec,
+    reference_spec,
+    policy="FixedAutoRegressiveParameters")
+spec_x13_ref
+sa_x13_ref <- x13(y_new, spec_x13_ref)
+summary(sa_x13_ref)
+
+```
+```{r}
+
+#| echo: true
+#| eval: false
+library("rjd3toolkit")
+library("rjd3x13")
+# specification for first estimation
+spec_ts_1 <- x13_spec("rsa5")
+
+y_raw<-rjd3toolkit::ABS$X0.2.05.10.M
+# first estimation
+sa_ts <- x13(y_raw, spec_ts_1) 
+sa_ts
+
+# specs to refresh
+current_result_spec <- sa_ts$result_spec
+reference_spec <- sa_ts$estimation_spec
+spec_ts_ref <- x13_refresh(
+    current_result_spec,
+    reference_spec, 
+    period=12,
+    start=c(2017,1),
+    end = c(2017,6),
+    policy = "Current")
+spec_ts_ref
+sa_ts_ref <- x13(y_new, spec_ts_ref)
+summary(sa_ts_ref)
+```
+
+
+
+#### Concl and Issues draft : ok 
+
+- free parameters doesn't reestimate arima coeffs : true ? FALSE ok 
+- free parameters inst the default: ok 
+
+ISSUE set up
+- print pb with arima coeffs : are printed as fixed in the specification in 
+ "FixedParameters", "FixedAutoRegressiveParameters", "Freeparameters"
+ print is ok in "Outliers_StochasticComponent", "Outliers"
+ coeffs are set to zero 
+ 
+ check in TS
+

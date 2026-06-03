@@ -276,33 +276,146 @@ window(sa_x13_ref$result$final$d11final, start = 2009, end = 2010) # same result
 #################################### end default test spec ####################
 # example for git issue : outliers
 
-y <- rjd3toolkit::ABS$X0.2.08.10.M
-# raw series for first estimation
-y_raw <- window(y, end = 2009)
-# raw series for second (refreshed) estimation
-y_new <- window(y, end = 2010)
+y_raw <- ts(
+    ipi[, "RF0812"],
+    frequency = 12,
+    start = c(1990, 1),
+    end = c(2021, 12)
+)
+y_new <- ts(
+    ipi[, "RF0812"],
+    frequency = 12,
+    start = c(1990, 1),
+    end = c(2022, 9)
+)
+
+# start(y_raw)
+end(y_raw)
+# start(y_new)
+end(y_new)
+plot(y_raw)
+plot(y_new)
+window(y_new,start=c(2022,3), end=c(2022,5))<-c(51,52,53)
+
 # specification for first estimation
 spec_x13_1 <- x13_spec("rsa5c")
-# first estimation
-sa_x13 <- x13(y_raw, spec_x13_1) # AO (200,6) and TD (2000,7)
+spec_x13_1 <-add_outlier(spec_x13_1, type = "AO",
+                         date = c("2020-03-01","2020-04-01"))
 
+# first estimation
+sa_x13 <- x13(y_raw, spec_x13_1) # AO (2000,6) and TD (2000,7)
+sa_x13
 # refreshing the specification
 current_result_spec <- sa_x13$result_spec
 current_domain_spec <- sa_x13$estimation_spec
+#1  ####### no param: en fait period est necessaire
+spec_x13_ref <- x13_refresh(
+    current_result_spec, # point spec to be refreshed
+    current_domain_spec, # domain spec (set of constraints)
+    policy = "Outliers")
+spec_x13_ref
+spec_x13_ref <- x13_refresh(
+    current_result_spec, # point spec to be refreshed
+    current_domain_spec, # domain spec (set of constraints)
+    policy = "Outliers_StochasticComponent")
+
+spec_x13_ref
+##### conclusion
+# period optional: no but no error
+# re identified on whole series
+
+#2 ####### start seul avec period
 spec_x13_ref <- x13_refresh(
     current_result_spec, # point spec to be refreshed
     current_domain_spec, # domain spec (set of constraints)
     policy = "Outliers",
-    period = 12,
-    start = c(2001, 1), # outliers should be  identified before 2001
-    end = c(2008, 12)
-) # outliers should be identified from 2009
-spec_x13_ref # outliers will be identified from 2009
-# 2nd estimation with refreshed specification
-sa_x13_ref <- x13(y_new, spec_x13_ref)
+    start = c(2000, 1),period=12)
+spec_x13_ref
+
+
+spec_x13_ref <- x13_refresh(
+    current_result_spec, # point spec to be refreshed
+    current_domain_spec, # domain spec (set of constraints)
+    policy = "Outliers_StochasticComponent",
+    start = c(2000, 1),period=12)
+spec_x13_ref
+
+# concl: ok, reid from start date to end of series
+
+#3 ####### end seul avec period
+spec_x13_ref <- x13_refresh(
+    current_result_spec, # point spec to be refreshed
+    current_domain_spec, # domain spec (set of constraints)
+    policy = "Outliers",period = 12,
+    end = c(2000, 1))
+spec_x13_ref
+# pas de reident
+
+spec_x13_ref <- x13_refresh(
+    current_result_spec, # point spec to be refreshed
+    current_domain_spec, # domain spec (set of constraints)
+    policy = "Outliers_StochasticComponent",period=12,
+    end = c(2000, 1))
+spec_x13_ref
+
+# concl: end seul pas de reident, modele
+
+#4 ####### start et end
+spec_x13_ref <- x13_refresh(
+    current_result_spec, # point spec to be refreshed
+    current_domain_spec, # domain spec (set of constraints)
+    policy = "Outliers",
+    period=12,
+    start=c(2021,1),
+    end = c(2021,11))
+spec_x13_ref
+
+
+spec_x13_ref <- x13_refresh(
+    current_result_spec, # point spec to be refreshed
+    current_domain_spec, # domain spec (set of constraints)
+    policy = "Outliers_StochasticComponent",
+    period=12,
+    start= c(2021,1),
+    end = c(2021, 11))
+spec_x13_ref
+
+# concl:
+# so if I want last two years
+
+
+
+
+
+
+
+
+
 
 sa_x13_ref$result$preprocessing # oultliers identified from 2009 but NOT before 2001
 sa_x13_ref$result$preprocessing$description$variables
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### refresh with "Fixed"

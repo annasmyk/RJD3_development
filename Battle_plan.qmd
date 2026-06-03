@@ -36,11 +36,14 @@ GUI
 
 Currently working on (details in TOPICS..)
 
-### Maj doc refresh 
+### Harmonizing rjd3tramoseats with rjd3x13
 
-clarified txt and examples in 
-- x13 regarima refresh 
-- tramos eats 
+and in cruncher 
+
+and in rjd3 production 
+
+
+### Maj doc refresh 
 
 Harmonize refresh policies names
 
@@ -68,8 +71,11 @@ fatih code
 - free parameters doesn't reestimate arima coeffs : true ?
 - free parameters inst the default
 
-# comportement avec la partie reg arim
-## - n'efface pas set transform avec complete !! ISSUE ? voir GUI
+#### TESTS to do 
+comportement avec la partie reg arim
+- n'efface pas set transform avec complete !! ISSUE ? voir GUI
+- spans 
+
 
 # comportement avec partie x11
     ## DOC correction de x11 spec
@@ -94,16 +100,14 @@ fatih code
 - lack print elements in seats ? bcasts, forecasts ?
 
 
+### rjd3toolkit distrib 
+
+supress inv gaussian cf issue
 
 ### rjd3prodcution 
 
-What is indispensable for DT publi ?
 
-- readme 
 
-- functions names referenced 
-
-= > ok, see the rest post publi 
 
 
 To "solve":

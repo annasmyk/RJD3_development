@@ -1,0 +1,545 @@
+---
+title: "T-rjd3workspace-refresh"
+format: html
+---
+
+```{r}
+#| label: loading-rjdverse
+#| echo: true
+#| eval: true
+library("rjd3toolkit")
+library("rjd3workspace")
+```
+
+# Objectifs
+
+- key reproducible format of testing (pre-vignette)
+- the vignette
+
+- end up with updated Fatih code and verif results in rjd3ws (not here)
+
+- refresh data : TS, voir pour toutes policies + metadata ?
+
+- idem fonction jsap_refresh
+
+soupçon: fonctionne sur 1er sap 
+
+pb practicité réinjection dans ws ?
+
+## next: cas outliers / outliers_stoch
+
+- pb period, end, start 
+
+- jsap_refresh: issue to do !! understand what happens
+
+- all, data, none (LATER ?), pas tarder si JP s'y met 
+
+- balayer issues battle plan 
+
+### Missing doc 
+
+jws_add(jws, jsap)
+
+
+
+## recap JP questions 
+
+- current: issue ok 
+
+- period, start end with outliers : issue ok
+
+- jsap_refresh: issue ok  num 126
+
+- all, data, none (LATER ?), pas tarder si JP s'y met 
+
+
+### answered but to do 
+
+- data all none:ok 
+
+- vider cache: à integrer 
+
+- compute à integrer 
+
+
+
+## general 
+
+- harmonize policies names 
+
+
+
+
+## Issues
+
+- policy current not available yet : take out of doc fort the moment : issue set up 
+
+# Load and Read a Workspace
+```{r}
+#| echo: true
+#| eval: true
+
+library("rjd3toolkit")
+library("rjd3workspace")
+# file <- "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Workspaces/rjd3workspace_refresh_test_GUI.xml"
+
+file <- system.file("workspaces", "workspace_test_refresh.xml", package = "rjd3workspace")
+jws <- jws_open(file)
+# Read workspace
+rws <- read_workspace(jws, compute= TRUE)
+rws$processing$`SAProcessing-1`$`RF0811`$ts
+rws$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws$processing$`SAProcessing-1`$`RF0811`$resultSpec
+rws$processing$`SAProcessing-1`$`RF0811`$results
+summary(rws$processing$`SAProcessing-1`$`RF0811`$results)
+
+rws$processing$`SAProcessing-2`$`RF0811`$referenceSpec # pb outliers is enabled no
+rws$processing$`SAProcessing-2`$`RF0811`$estimationSpec
+rws$processing$`SAProcessing-2`$`RF0811`$resultSpec 
+# 5 pre specifed detecté et que 3 declarés
+rws$processing$`SAProcessing-2`$`RF0811`$results
+summary(rws$processing$`SAProcessing-2`$`RF0812`$results)
+
+
+```
+
+### Issues 
+
+- print dans seats spec (should see all the changeable parameters)
+
+forecasts 
+backcasts 
+
+- print seats dans results : idem 
+
+# Refresh 
+
+## Default option 
+
+```{r}
+# file <- "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Workspaces/rjd3workspace_refresh_test_GUI.xml"
+
+library("rjd3workspace")
+
+file <- system.file("workspaces", "workspace_test_refresh.xml", package = "rjd3workspace")
+jws <- jws_open(file)
+jws_compute(jws)
+jws_refresh(jws)
+
+# v<-jws_refresh(jws, policy = "Complete")
+# v NULL
+## check refresh in R
+# sap 1 ok
+rws2 <- read_workspace(jws, compute= TRUE)
+rws2$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$resultSpec # outliers notés pre specified alors qu'ils ne le sont pas: en fait si dans la result spec 
+rws2$processing$`SAProcessing-1`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-1`$`RF0811`$results)
+
+
+# sap 2 (pas refresh)
+rws2$processing$`SAProcessing-2`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$resultSpec 
+# result spec pas reestimée ??
+rws2$processing$`SAProcessing-2`$`RF0811`$results
+```
+
+### Issues NONE
+
+- is default parameters ok
+
+
+
+## Complete
+
+### WS
+
+```{r}
+# file <- "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Workspaces/rjd3workspace_refresh_test_GUI.xml"
+
+library("rjd3workspace")
+
+file <- system.file("workspaces", "workspace_test_refresh.xml", package = "rjd3workspace")
+jws <- jws_open(file)
+jws_compute(jws)
+
+jws_refresh(jws, policy = "Complete")
+# v<-jws_refresh(jws, policy = "Complete")
+# v NULL
+## check refresh in R
+# sap 1 ok
+rws2 <- read_workspace(jws, compute= TRUE)
+rws2$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$resultSpec # outliers notés pre specified alors qu'ils ne le sont pas: en fait si dans la result spec 
+rws2$processing$`SAProcessing-1`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-1`$`RF0811`$results)
+
+
+# sap 2 (pas refresh)
+rws2$processing$`SAProcessing-2`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$resultSpec 
+# result spec pas reestimée ??
+rws2$processing$`SAProcessing-2`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-2`$`RF0811`$results)
+```
+
+
+### Issues: SPAN : setup 
+
+- summary : lack series span and model span 
+
+
+
+### SAP (LATER) 
+
+
+```{r}
+library("rjd3workspace")
+file <- system.file("workspaces", "workspace_test_refresh.xml", package = "rjd3workspace")
+jws <- jws_open(file)
+jws_compute(jws)
+sap1<-jws_sap(jws,1)
+jsap_refresh(sap1, policy = "Complete")
+sap_r<-jsap_refresh(sap1, policy = "Complete") 
+
+
+##ISSUE diff return
+# pas pratique car on est obligé de sortir le sap et de le re rentrer
+
+jws_r<-jws_new()
+# reinjecter dans we ?
+jws_add(jws_r,sap_r)
+
+
+## check refresh in R
+# sap 1 ok
+rws2 <- read_workspace(jws_r, compute= TRUE)
+rws2$processing$`SAProcessing-1`
+rws2$processing$`SAProcessing-1`$`RF0811 (frozen`()
+rws2$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$resultSpec
+# outliers notés pre specified alors qu'ils ne le sont pas ?
+summary(rws2$processing$`SAProcessing-1`$`RF0811`$results)
+
+# sap 2
+rws2$processing$`SAProcessing-2`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$resultSpec # result spec pas reestimée ??
+rws2$processing$`SAProcessing-2`$`RF0811`$results
+
+
+
+```
+
+
+### Issues: pb return 
+
+return different jsap_refresh et jws refresh 
+
+- second or 3rd sap not refeshed 
+
+
+## Fixed 
+
+### WS
+
+```{r}
+# file <- "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Workspaces/rjd3workspace_refresh_test_GUI.xml"
+
+library("rjd3workspace")
+
+file <- system.file("workspaces", "workspace_test_refresh.xml", package = "rjd3workspace")
+jws <- jws_open(file)
+jws_compute(jws)
+
+jws_refresh(jws, policy = "Fixed")
+# v<-jws_refresh(jws, policy = "Complete")
+# v NULL
+## check refresh in R
+# sap 1 ok
+rws2 <- read_workspace(jws, compute= TRUE)
+rws2$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$resultSpec 
+rws2$processing$`SAProcessing-1`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-1`$`RF0811`$results)
+# sap 2
+rws2$processing$`SAProcessing-2`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$resultSpec # result spec pas reestimée ??
+rws2$processing$`SAProcessing-2`$`RF0811`$results
+```
+
+### Issues: print 
+
+- print in seats, outliers not FIXED, issue set up !
+
+
+
+
+
+## FixedParameters
+### WS
+
+```{r}
+file <- "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Workspaces/rjd3workspace_refresh_test_GUI.xml"
+
+jws <- jws_open(file)
+jws_compute(jws)
+jws_refresh(jws, policy = "FixedParameters")
+# v<-jws_refresh(jws, policy = "Complete")
+# v NULL
+## check refresh in R
+# sap 1 ok
+rws2 <- read_workspace(jws, compute= TRUE)
+rws2$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$resultSpec 
+rws2$processing$`SAProcessing-1`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-1`$`RF0811`$results)
+# sap 2
+rws2$processing$`SAProcessing-2`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$resultSpec # result spec pas reestimée ??
+rws2$processing$`SAProcessing-2`$`RF0811`$results
+
+
+
+```
+
+### Issues 
+
+-with seats outliers not INITIAL : issue set up 
+
+
+
+## FixedAutoRegressiveParameters
+
+### WS
+
+```{r}
+# file <- "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Workspaces/rjd3workspace_refresh_test_GUI.xml"
+
+library("rjd3workspace")
+
+file <- system.file("workspaces", "workspace_test_refresh.xml", package = "rjd3workspace")
+jws <- jws_open(file)
+jws_compute(jws)
+
+jws_refresh(jws, policy = "FixedAutoRegressiveParameters")
+## check refresh in R
+# sap 1 ok
+rws2 <- read_workspace(jws, compute= TRUE)
+rws2$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$resultSpec 
+rws2$processing$`SAProcessing-1`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-1`$`RF0811`$results)
+# sap 2
+rws2$processing$`SAProcessing-2`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$resultSpec # result spec pas reestimée ??
+rws2$processing$`SAProcessing-2`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-2`$`RF0811`$results)
+
+
+```
+
+
+
+### Issues 
+
+- outlier print not (INITIAL)in TS vs X13: issue set up 
+
+- x13, auto reg param not reestimated (written in estimation spec): OK mais MA non plus ...
+- TS idem 
+
+
+## FreeParameters
+
+### WS
+
+```{r}
+# file <- "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Workspaces/rjd3workspace_refresh_test_GUI.xml"
+
+library("rjd3workspace")
+
+file <- system.file("workspaces", "workspace_test_refresh.xml", package = "rjd3workspace")
+jws <- jws_open(file)
+jws_compute(jws)
+
+jws_refresh(jws, policy = "FreeParameters")
+## check refresh in R
+# sap 1 ok
+rws2 <- read_workspace(jws, compute= TRUE)
+rws2$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$resultSpec 
+rws2$processing$`SAProcessing-1`$`RF0811`$results
+summary(rws$processing$`SAProcessing-1`$`RF0811`$results)
+# sap 2
+rws2$processing$`SAProcessing-2`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$resultSpec # result spec pas reestimée ??
+rws2$processing$`SAProcessing-2`$`RF0811`$results
+
+
+
+```
+
+
+
+### Issues 
+
+
+- les coeffs arima sont ecrits dans l'estimation spec comme s'ils n'allaient pas etre reestimés mais le sont 
+Issue set up
+
+
+
+
+
+
+
+
+## Outliers
+
+### WS
+
+```{r}
+# file <- "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Workspaces/rjd3workspace_refresh_test_GUI.xml"
+
+library("rjd3workspace")
+
+file <- system.file("workspaces", "workspace_test_refresh.xml", package = "rjd3workspace")
+jws <- jws_open(file)
+jws_compute(jws)
+
+jws <- jws_open(file)
+# Read current workspace
+rws <- read_workspace(jws, compute= TRUE)
+rws$processing$`SAProcessing-1`$`RF0811`$ts
+rws$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws$processing$`SAProcessing-1`$`RF0811`$resultSpec
+rws$processing$`SAProcessing-1`$`RF0811`$results
+summary(rws$processing$`SAProcessing-1`$`RF0811`$results)
+
+# refresh
+jws_refresh(jws, policy = "Outliers")
+jws_refresh(jws, policy = "Outli",start=c(2020,1))ers
+
+
+jws_refresh(jws, policy = "Outliers", period=12, start=c(2020,4))
+
+jws_refresh(jws, policy = "Outliers", period=12, start=c(2020,4), end=c(2020,5))
+
+
+jws_refresh(jws, policy = "Outliers", period=12, start=c(2020,1), end=c(2020,4))
+
+jws_refresh(jws, policy = "Outliers", period=12, end=c(2020,4))
+
+## Read refreshed workspace
+# sap 1 ok
+rws2 <- read_workspace(jws, compute= TRUE)
+rws2$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$resultSpec 
+rws2$processing$`SAProcessing-1`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-1`$`RF0811`$results)
+# sap 2
+rws2$processing$`SAProcessing-2`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$resultSpec # result spec pas reestimée ??
+rws2$processing$`SAProcessing-2`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-2`$`RF0811`$results)
+
+
+```
+
+
+
+### Issues 
+
+- outliers pas effacés à partir du start 
+
+- dans le print les ordre du modele arima sont reinitilaisés meme si pas stochastic componenet, coeffs modele reg arima reviennent bien à zero: OK if 
+
+
+- Detection span: From 2100-01-01
+
+#### Error on period to be added
+
+#### Confus
+
+
+
+
+
+
+
+
+
+
+
+
+## Outliers_StochasticComponent
+
+### WS
+
+```{r}
+file <- "C:/Users/YWYD5I/Documents/00_RJD3_Developpement/RJD3_development/Workspaces/rjd3workspace_refresh_test_GUI.xml"
+
+jws <- jws_open(file)
+jws_compute(jws)
+jws_refresh(jws, policy = "Outliers_StochasticComponent", period=12, end=c(2020,4))
+## check refresh in R
+# sap 1 ok
+rws2 <- read_workspace(jws, compute= TRUE)
+rws2$processing$`SAProcessing-1`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-1`$`RF0811`$resultSpec 
+rws2$processing$`SAProcessing-1`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-1`$`RF0811`$results)
+# sap 2
+rws2$processing$`SAProcessing-2`$`RF0811`$referenceSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$estimationSpec
+rws2$processing$`SAProcessing-2`$`RF0811`$resultSpec # result spec pas reestimée ??
+rws2$processing$`SAProcessing-2`$`RF0811`$results
+summary(rws2$processing$`SAProcessing-2`$`RF0811`$results)
+
+
+```
+
+
+
+### Issues 
+
+- outliers pas effacés à partir du start 
+- orders eet coeffs modele reg arima reviennent bien à zero
+- Detection span: From 2100-01-01
+
+- si on met end 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
